@@ -3,8 +3,111 @@ import pandas as pd
 from io import BytesIO
 from datetime import datetime
 import calendar
+import bcrypt
+import base64
 
 st.set_page_config(page_title="Calibration Dashboard", layout="wide")
+
+USERNAME = "admin"
+PASSWORD_HASH = b"$2b$12$ojKsHiYQie/NWSr1v2JIU.kQSdS.vp/dENxAsYsRzw9rbQp9FhQNa"
+
+def check_login(user, pwd):
+    return (
+        user == USERNAME
+        and bcrypt.checkpw(pwd.encode(), PASSWORD_HASH)
+    )
+
+# ===== SESSION =====
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+# ===== LOGIN PAGE =====
+if not st.session_state.logged_in:
+
+    def load_logo_base64(path):
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+
+    logo_base64 = load_logo_base64("garudafood_logo.png")
+
+    st.markdown("""
+    <style>
+        #MainMenu, footer, header {visibility: hidden;}
+
+        body {
+            background-color: #f3f4f6;
+        }
+
+        .login-box {
+            background-color: #ffffff;
+            padding: 40px 35px 35px 35px;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .stTextInput > div > div > input {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .stButton > button {
+            background-color: #1E88E5;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px;
+            border: none;
+            width: 100%;
+        }
+
+        .stButton > button:hover {
+            background-color: #1565C0;
+        }
+
+        .block-container {
+            padding-top: 5rem;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    col_left, col_center, col_right = st.columns([3, 2, 3])
+
+    with col_center:
+        st.markdown(f"""
+        <div style="text-align:center;">
+            <img src="data:image/png;base64,{logo_base64}" width="120" />
+            <h2 style="margin-bottom: 5px;">Login</h2>
+            <p style="margin-bottom: 30px; color: #6b7280; font-size: 14px;">
+                Calibration Dashboard
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        username = st.text_input(
+            "Username",
+            placeholder="Username",
+            label_visibility="collapsed"
+        )
+
+        password = st.text_input(
+            "Password",
+            type="password",
+            placeholder="Password",
+            label_visibility="collapsed"
+        )
+
+        if st.button("Sign In", use_container_width=True):
+            if check_login(username, password):
+                st.session_state.logged_in = True
+                st.rerun()
+            else:
+                st.error("❌ Username atau password salah")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+    st.stop()
 
 st.markdown("""
 <style>
@@ -252,7 +355,7 @@ if uploaded_file and st.session_state.data_dict:
     belum = status_counts.get(' Not Yet', 0)
     
     with col1:
-        st.metric(" Total Machine", total_mesin)
+        st.metric(" Calibration Plan", total_mesin)
     with col2:
         persen_tepat = f"{tepat/total_mesin*100:.1f}%" if total_mesin > 0 else "0%"
         st.metric(" On Time", tepat, delta=persen_tepat)
