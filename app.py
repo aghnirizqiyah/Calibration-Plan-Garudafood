@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from st_aggrid import AgGrid, GridOptionsBuilder
 from io import BytesIO
 from datetime import datetime
 import calendar
@@ -296,64 +295,9 @@ if uploaded_file and st.session_state.data_dict:
                 .dt.strftime('%d-%m-%Y')
 
     # Styling
-    # styled_df = df_filtered.style.apply(color_status_row, axis=1)
-    # st.dataframe(styled_df, use_container_width=True, height=500, hide_index=True)
+    styled_df = df_filtered.style.apply(color_status_row, axis=1)
+    st.dataframe(styled_df, use_container_width=True, height=500, hide_index=True)
 
-    # ====== TABEL EXCEL-LIKE DENGAN FREEZE KOLOM ======
-    gb = GridOptionsBuilder.from_dataframe(df_filtered)
-    
-    # Freeze kolom kiri
-    gb.configure_column(
-        "NO",
-        pinned="left",
-        width=40,
-        suppressSizeToFit=True,
-        suppressMenu=True,
-        menuTabs=[],                
-        sortable=False,
-        filter=False
-        )
-    
-    gb.configure_column(
-         "NAMA ALAT",
-         pinned="left",
-         width=320,
-         suppressSizeToFit=True
-         )
-    
-    # Default kolom lain (BIAR LEBAR & SCROLL)
-    gb.configure_default_column(
-        minWidth=140,
-        resizable=True,
-        sortable=False,
-        filter=False,
-        suppressMenu=True,
-        menuTabs=[]
-        )
-    
-    # PENTING: bikin behavior seperti Excel
-    gb.configure_grid_options(
-        domLayout="normal",
-        suppressHorizontalScroll=False,
-        suppressMenuHide=True,
-        suppressMovableColumns=True,
-        suppressFieldDotNotation=True,
-        suppressDragLeaveHidesColumns=True,
-        suppressContextMenu=True,     
-        enableBrowserTooltips=False,
-        headerHeight=40
-        )
-    gridOptions = gb.build()
-    
-    AgGrid(
-        df_filtered,
-        gridOptions=gridOptions,
-        height=520,
-        fit_columns_on_grid_load=False,  
-        theme="balham",
-        )
-    
-    st.markdown("---")
 
     # Form input realisasi
     st.subheader(" Realization Date")
