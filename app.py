@@ -454,7 +454,7 @@ if uploaded_file and st.session_state.data_dict:
         
         summary = df_filtered.groupby(group_col).agg({
             'NO': 'count',
-            'STATUS': lambda x: (x == 'On Time').sum()
+            'STATUS': lambda x: (x == ' On Time').sum()
         }).rename(columns={'NO': 'Total', 'STATUS': 'On Time'})
         
         summary['Not Yet/Late'] = summary['Total'] - summary['On Time']
